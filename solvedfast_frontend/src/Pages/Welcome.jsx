@@ -2,7 +2,6 @@ import { Typography, IconButton } from "@mui/material";
 import { Fragment } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import ConfigMenu from "../Components/ConfigMenu";
 
 export default function Welcome() {
   return (
@@ -27,7 +26,6 @@ export default function Welcome() {
             right: 36,
           }}
         >
-          <ConfigMenu></ConfigMenu>
         </Box>
       </Box>
     </Fragment>

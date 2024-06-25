@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
-import Especialidad from "../models/especialidad.model.js";
 
 // Function to validate tipo_documento
 export const validateTipoDocumento = (tipo_documento, documento_identidad) => {
     const errors = [];
-    if (!tipo_documento) {
+
+    console.log(tipo_documento)
+    if (tipo_documento == null || tipo_documento == undefined) {
         errors.push("Tipo de documento es requerido");
     } else {
         if (tipo_documento === "0") {
@@ -39,29 +39,6 @@ export const validateNames = (field, fieldName) => {
             errors.push(`Solo se permiten letras y espacios en ${fieldName}`);
         } else if (field.replace(/\s+/g, ' ').trim().length > 25) {
             errors.push(`${fieldName} demasiado largo`);
-        }
-    }
-    return errors;
-};
-
-// Function to validate especialidad
-export const validateEspecialidad = async (especialidad) => {
-    const errors = [];
-    if (!especialidad || !Array.isArray(especialidad) || especialidad.length < 1) {
-        errors.push("Se debe de tener al menos una especialidad");
-    } else {
-        const specialtiesExist = await Promise.all(
-            especialidad.map(async (id) => {
-                if (!mongoose.Types.ObjectId.isValid(id)) {
-                    return `Especialidad con id ${id} no es un ObjectId válido`;
-                }
-                const exists = await Especialidad.findById(id);
-                return exists ? null : `Especialidad con id ${id} no existe`;
-            })
-        );
-        const specialtyErrors = specialtiesExist.filter(error => error !== null);
-        if (specialtyErrors.length > 0) {
-            errors.push(...specialtyErrors);
         }
     }
     return errors;

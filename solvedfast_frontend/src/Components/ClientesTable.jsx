@@ -32,12 +32,6 @@ const StyledTableRow = styled(TableRow)(({}) => ({
     },
 }));
 
-const historial = [
-    {numero_llamada: "123123", tienda: "Promart", nombre_producto: "Cocina Bosh :3", serie: "123123", fecha_visita: "01-02-2003", tipo_servicio: "instalación", nombre_tecnico: "Pedro pedro pedro"},
-    {numero_llamada: "123123", tienda: "Promart", nombre_producto: "Cocina Bosh :3", serie: "123123", fecha_visita: "01-02-2003", tipo_servicio: "instalación", nombre_tecnico: "Pedro pedro pedro"},
-    {numero_llamada: "123123", tienda: "Promart", nombre_producto: "Cocina Bosh :3", serie: "123123", fecha_visita: "01-02-2003", tipo_servicio: "instalación", nombre_tecnico: "Pedro pedro pedro"},
-    {numero_llamada: "123123", tienda: "Promart", nombre_producto: "Cocina Bosh :3", serie: "123123", fecha_visita: "01-02-2003", tipo_servicio: "instalación", nombre_tecnico: "Pedro pedro pedro"}
-];
 
 export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRowsPerPage, totalRows, updateCliente, deleteCliente }) {
 
@@ -71,18 +65,6 @@ export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRow
         handleDeleteClose();
     };
 
-    /* Historial de servicios */
-    const [historialOpen, setHistorialOpen] = useState(false);
-
-    const handleHistorialOpen = (tecnico) => {
-        setSelectedTecnico(tecnico);
-        setHistorialOpen(true);
-    };
-
-    const handleHistorialClose = () => {
-        setSelectedTecnico(null);
-        setHistorialOpen(false);
-    };
 
     return (
         <Paper>
@@ -120,14 +102,6 @@ export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRow
                                 <StyledTableCell>{row.referencia}</StyledTableCell>
                                 <StyledTableCell>{row.comentario}</StyledTableCell>
                                 <StyledTableCell>
-                                    <IconButton
-                                        aria-label="verHistorial"
-                                        color="#e4e4e4"
-                                        onClick={() => handleHistorialOpen(row)}
-                                    >
-                                        <VisibilityIcon />
-                                    </IconButton>
-
                                     <IconButton
                                         aria-label="edit"
                                         color="warning"
@@ -167,12 +141,6 @@ export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRow
                     selectedPersonInfo={selectedTecnico.nombres + " " + selectedTecnico.apellido_materno + " " + selectedTecnico.apellido_paterno}
                 />
             )}
-
-            <HistorialServicios
-                open={historialOpen}
-                handleClose={handleHistorialClose}
-                historial={historial}
-            />
         </Paper>
     );
 }
