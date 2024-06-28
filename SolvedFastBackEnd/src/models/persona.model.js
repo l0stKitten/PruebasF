@@ -5,18 +5,6 @@ const trimSpaces = (v) => v.replace(/\s+/g, " ").trim().toUpperCase();
 
 const personaSchema = new Schema(
   {
-    tipo_documento: { type: Number, default: 0 },
-    documento_identidad: {
-      type: String,
-      validate: {
-        validator: function (v) {
-          return !v || /^\d{8}$/.test(v);
-        },
-        message: (props) =>
-          `${props.value} no es un DNI válido. Debe tener exactamente 8 dígitos y solo contener números.`,
-      },
-      set: trimSpaces,
-    },
     nombres: {
       type: String,
       required: [true, "Los nombres son requeridos"],
@@ -34,16 +22,6 @@ const personaSchema = new Schema(
       required: [true, "Apellido materno es requerido"],
       maxlength: [25, "Apellido materno no puede tener más de 25 caracteres"],
       set: trimSpaces,
-    },
-    num_telefono: {
-      type: [{ type: String }],
-      validate: {
-        validator: function (v) {
-          return v.length > 0;
-        },
-        message: "Debe haber al menos un número de teléfono",
-      },
-      required: [true, "Los números de teléfono son requeridos"],
     },
     fecha_creacion: {
       type: Date,

@@ -6,12 +6,6 @@ const clienteSchema = new mongoose.Schema({
 	provincia: String,
 	direccion: String,
 	referencia: String,
-	historial_servicios: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Servicio",
-		},
-	],
 	comentario: String,
 });
 

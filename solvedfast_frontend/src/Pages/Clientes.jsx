@@ -6,9 +6,6 @@ import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-
-import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 
 import axios from "axios";
@@ -17,16 +14,6 @@ import { toast } from "react-toastify";
 import FormCliente from "../Components/FormCliente";
 
 export default function Clientes() {
-  /* Telefono y Especialidades */
-  const [telefonos, setTelefonos] = useState([]);
-
-  // Update formValues.num_telefono when telefonos changes
-  useEffect(() => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      num_telefono: telefonos,
-    }));
-  }, [telefonos]);
 
   /* Get Clientes */
   const [clientes, setClientes] = useState([]);
@@ -43,6 +30,8 @@ export default function Clientes() {
           perPage: rowsPerPage,
         },
       });
+
+      console.log(response.data.clientes)
       setClientes(response.data.clientes);
       setTotalClientes(response.data.totalPages * rowsPerPage);
     } catch (error) {
@@ -56,8 +45,6 @@ export default function Clientes() {
 
   /* Create Form Values */
   const [open, setOpen] = useState(false);
-  const [openSubModal, setSubModal] = useState(false);
-  const [clientesEncontrados, setClientesEncontrados] = useState([]);
   const [formValues, setFormValues] = useState({
     documento_identidad: "",
     tipo_documento: "0",
@@ -69,7 +56,6 @@ export default function Clientes() {
     direccion: "",
     referencia: "",
     comentario: "",
-    num_telefono: [],
   });
 
   const handleClickOpen = () => {
@@ -78,7 +64,6 @@ export default function Clientes() {
 
   const handleClose = () => {
     setOpen(false);
-    setTelefonos([]);
     setFormValues({
       documento_identidad: "",
       tipo_documento: "0",
@@ -90,7 +75,6 @@ export default function Clientes() {
       direccion: "",
       referencia: "",
       comentario: "",
-      num_telefono: [],
     });
   };
 
@@ -100,32 +84,6 @@ export default function Clientes() {
       ...prevValues,
       [name]: value,
     }));
-  };
-
-  const handleSubmit = async (event) => {
-    const searchSimilar = {
-      nombres: formValues.nombres,
-      apellido_paterno: formValues.apellido_paterno,
-      apellido_materno: formValues.apellido_materno,
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/api/cliente/similar",
-        searchSimilar
-      );
-
-      const similarClientes = response.data.clientesEncontrados;
-      console.log(similarClientes);
-      if (similarClientes.length > 0) {
-        setClientesEncontrados(response.data.clientesEncontrados);
-        setSubModal(true);
-      } else {
-        handleCreateClienteAnyway();
-      }
-    } catch (error) {
-      console.error("Error creating cliente:", error);
-    }
   };
 
   const handleCreateClienteAnyway = (event) => {
@@ -149,9 +107,7 @@ export default function Clientes() {
 
   const handleClickOpenEdit = (row) => {
     setOpen(false);
-    setSubModal(false);
     setFormValues(row);
-    setTelefonos(row.num_telefono);
     setOpenEdit(true);
   };
 
@@ -169,10 +125,7 @@ export default function Clientes() {
       direccion: "",
       referencia: "",
       comentario: "",
-      num_telefono: [],
     });
-
-    setTelefonos([]);
   };
 
   const handleSubmitEdit = async () => {
@@ -208,27 +161,6 @@ export default function Clientes() {
     }
   };
 
-  /* Search Query*/
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearchSubmit = () => {
-    if (searchQuery === "") {
-      setRefresh(!refresh);
-    } else {
-      console.log(searchQuery);
-      axios
-        .post("http://localhost:8000/api/cliente/find", { data: searchQuery })
-        .then((response) => {
-          setClientes(response.data.clientes);
-          setPage(0);
-        })
-        .catch((error) => {
-          console.error("Error finding cliente:", error);
-          toast.error("Error al encontrar al cliente: " + error.message);
-        });
-    }
-  };
-
   return (
     <Fragment>
       <Box sx={{ flexGrow: 1 }}>
@@ -248,42 +180,11 @@ export default function Clientes() {
               <Button
                 color="success"
                 variant="contained"
+                id="agregar_cliente"
                 startIcon={<AddIcon />}
                 onClick={handleClickOpen}
               >
                 AGREGAR CLIENTE
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
-
-        <Grid
-          container
-          spacing={2}
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ pt: 1, pl: 6, pr: 6 }}
-        >
-          <Grid item xs={12} md={8}>
-            <TextField
-              fullWidth
-              id="outlined-basic"
-              label="Buscar técnico por dato"
-              variant="outlined"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-              <Button
-                color="primary"
-                variant="contained"
-                startIcon={<SearchIcon />}
-                onClick={handleSearchSubmit}
-              >
-                BUSCAR CLIENTE
               </Button>
             </Box>
           </Grid>
@@ -317,15 +218,7 @@ export default function Clientes() {
         handleClose={handleClose}
         formValues={formValues}
         handleChange={handleChange}
-        handleSubmitForm={handleSubmit}
-        telephons={telefonos}
-        setTelephons={setTelefonos}
-        openSubModal={openSubModal}
-        subModaltitle={"Clientes Similares"}
-        setSubModal={setSubModal}
-        encontrados={clientesEncontrados}
-        handleCreateAnyway={handleCreateClienteAnyway}
-        handleSelect={handleClickOpenEdit}
+        handleSubmitForm={handleCreateClienteAnyway}
       ></FormCliente>
 
       <FormCliente
@@ -335,8 +228,6 @@ export default function Clientes() {
         formValues={formValues}
         handleChange={handleChange}
         handleSubmitForm={handleSubmitEdit}
-        telephons={telefonos}
-        setTelephons={setTelefonos}
       ></FormCliente>
     </Fragment>
   );

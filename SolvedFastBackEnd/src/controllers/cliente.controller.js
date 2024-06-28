@@ -1,78 +1,5 @@
 import Cliente from "../models/cliente.model.js";
-import { similarityPercentage } from "../js/levenshtein.js";
 import validationCliente from "../validations/clienteValidation.js";
-
-export const searchSimilarCliente = async (req, res) => {
-  const { nombres, apellido_paterno, apellido_materno } = req.body;
-
-  const normalize = (str) =>
-    str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-
-  const normalizedNombres = normalize(nombres);
-  const normalizedApellidoPaterno = normalize(apellido_paterno);
-  const normalizedApellidoMaterno = normalize(apellido_materno);
-
-  try {
-    const existingClientes = await Cliente.find({
-      $or: [
-        { nombres: { $regex: normalizedNombres, $options: "i" } },
-        {
-          apellido_paterno: {
-            $regex: normalizedApellidoPaterno,
-            $options: "i",
-          },
-        },
-        {
-          apellido_materno: {
-            $regex: normalizedApellidoMaterno,
-            $options: "i",
-          },
-        },
-      ],
-    });
-
-    // Filter the results to find significant matches
-    const matchingClientes = existingClientes.filter((cliente) => {
-      const normalizedExistingNombres = normalize(cliente.nombres);
-      const normalizedExistingApellidoPaterno = normalize(
-        cliente.apellido_paterno
-      );
-      const normalizedExistingApellidoMaterno = normalize(
-        cliente.apellido_materno
-      );
-
-      const similarityNombres = similarityPercentage(
-        normalizedNombres,
-        normalizedExistingNombres
-      );
-      const similarityApellidoPaterno = similarityPercentage(
-        normalizedApellidoPaterno,
-        normalizedExistingApellidoPaterno
-      );
-      const similarityApellidoMaterno = similarityPercentage(
-        normalizedApellidoMaterno,
-        normalizedExistingApellidoMaterno
-      );
-
-      return (
-        similarityNombres >= 30 ||
-        similarityApellidoPaterno >= 30 ||
-        similarityApellidoMaterno >= 30
-      );
-    });
-
-    if (matchingClientes.length > 0) {
-      return res.status(200).json({ clientesEncontrados: matchingClientes });
-    } else {
-      return res.status(200).json({ clientesEncontrados: [] });
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
 
 export const createCliente = async (req, res) => {
   const errors = await validationCliente(req.body);
@@ -83,27 +10,20 @@ export const createCliente = async (req, res) => {
     }
 
   const {
-    documento_identidad,
-    tipo_documento,
     nombres,
     apellido_paterno,
     apellido_materno,
-    num_telefono,
     distrito,
     provincia,
     direccion,
     referencia,
     comentario,
-    forceCreate,
   } = req.body;
 
   const cliente = new Cliente({
-    documento_identidad,
-    tipo_documento,
     nombres,
     apellido_paterno,
     apellido_materno,
-    num_telefono,
     distrito,
     provincia,
     direccion,
@@ -151,12 +71,9 @@ export const updateCliente = async (req, res) => {
     }
 
   const {
-    documento_identidad,
-    tipo_documento,
     nombres,
     apellido_paterno,
     apellido_materno,
-    num_telefono,
     distrito,
     provincia,
     direccion,
@@ -166,12 +83,9 @@ export const updateCliente = async (req, res) => {
 
   try {
     await Cliente.findByIdAndUpdate(id, {
-      documento_identidad,
-      tipo_documento,
       nombres,
       apellido_paterno,
       apellido_materno,
-      num_telefono,
       distrito,
       provincia,
       direccion,
@@ -182,23 +96,6 @@ export const updateCliente = async (req, res) => {
     res.json({ _id: id, ...req.body });
   } catch (err) {
     res.json({ error: "Hubo un error al guardar el cliente: " + err.message });
-  }
-};
-
-export const getCliente = async (req, res) => {
-  const { id } = req.params;
-
-  const exists = await checkClienteExists(id);
-    if (!exists) {
-        return res.status(404).json({ error: "El cliente no existe" });
-    }
-    
-  try {
-    const cliente = await Cliente.findById(id);
-    res.json(cliente);
-  } catch (err) {
-    res.json({ error: "Hubo un error al obtener el cliente: " + err.message });
-    return;
   }
 };
 
@@ -216,93 +113,6 @@ export const getAllClientes = async (req, res) => {
 
     res.json({
       clientes,
-      currentPage: page,
-      totalPages: Math.ceil(totalClientes / perPage),
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Hubo un error al obtener los clientes" });
-  }
-};
-
-export const findCliente = async (req, res) => {
-  const page = req.query.page || 1;
-  const perPage = 50;
-
-  try {
-    var { data } = req.body;
-    data = data.replace(/\s+/g, " ").trim().toUpperCase();
-
-    const skipAmount = (page - 1) * perPage;
-
-    const regex = new RegExp(data, "i");
-
-    const clientesEncontrados = await Cliente.find({
-      $or: [
-        { documento_identidad: { $regex: data, $options: "i" } },
-        { nombres: { $regex: data, $options: "i" } },
-        { apellido_paterno: { $regex: data, $options: "i" } },
-        { apellido_materno: { $regex: data, $options: "i" } },
-        { num_telefono: { $regex: data, $options: "i" } },
-        { distrito: { $regex: data, $options: "i" } },
-        { provincia: { $regex: data, $options: "i" } },
-        { direccion: { $regex: data, $options: "i" } },
-        { referencia: { $regex: data, $options: "i" } },
-        { comentario: { $regex: data, $options: "i" } },
-        {
-          $expr: {
-            $regexMatch: {
-              input: {
-                $concat: [
-                  "$nombres",
-                  " ",
-                  "$apellido_paterno",
-                  " ",
-                  "$apellido_materno",
-                ],
-              },
-              regex: regex,
-            },
-          },
-        },
-      ],
-    })
-      .sort({ createdAt: -1 })
-      .skip(skipAmount)
-      .limit(perPage);
-
-    const totalClientes = await Cliente.countDocuments({
-      $or: [
-        { documento_identidad: { $regex: data, $options: "i" } },
-        { nombres: { $regex: data, $options: "i" } },
-        { apellido_paterno: { $regex: data, $options: "i" } },
-        { apellido_materno: { $regex: data, $options: "i" } },
-        { num_telefono: { $regex: data, $options: "i" } },
-        { distrito: { $regex: data, $options: "i" } },
-        { provincia: { $regex: data, $options: "i" } },
-        { direccion: { $regex: data, $options: "i" } },
-        { referencia: { $regex: data, $options: "i" } },
-        { comentario: { $regex: data, $options: "i" } },
-        {
-          $expr: {
-            $regexMatch: {
-              input: {
-                $concat: [
-                  "$nombres",
-                  " ",
-                  "$apellido_paterno",
-                  " ",
-                  "$apellido_materno",
-                ],
-              },
-              regex: regex,
-            },
-          },
-        },
-      ],
-    });
-
-    res.json({
-      clientes: clientesEncontrados,
       currentPage: page,
       totalPages: Math.ceil(totalClientes / perPage),
     });

@@ -12,8 +12,6 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import HistorialServicios from "./HistorialServicios";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -34,6 +32,8 @@ const StyledTableRow = styled(TableRow)(({}) => ({
 
 
 export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRowsPerPage, totalRows, updateCliente, deleteCliente }) {
+
+    console.log(rows)
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -69,13 +69,11 @@ export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRow
     return (
         <Paper>
             <TableContainer component={Paper} sx={{ boxShadow: 0 }}>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                <Table name={"cliente-list"} sx={{ minWidth: 700 }} aria-label="customized table">
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>Nombres</StyledTableCell>
                             <StyledTableCell>Apellidos</StyledTableCell>
-                            <StyledTableCell>Núm. Documento</StyledTableCell>
-                            <StyledTableCell>Teléfono</StyledTableCell>
                             <StyledTableCell>Distrito</StyledTableCell>
                             <StyledTableCell>Dirección</StyledTableCell>
                             <StyledTableCell>Provincia</StyledTableCell>
@@ -85,17 +83,10 @@ export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRow
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => (
+                        {rows ? rows.map((row) => (
                             <StyledTableRow key={row._id}>
                                 <StyledTableCell>{row.nombres}</StyledTableCell>
                                 <StyledTableCell>{`${row.apellido_paterno} ${row.apellido_materno}`}</StyledTableCell>
-                                <StyledTableCell>{row.documento_identidad}</StyledTableCell>
-                                <StyledTableCell>
-                                    {row.num_telefono.map((elem, index) => (
-                                            <div key={index}>{elem}</div>
-                                        ))
-                                    }
-                                </StyledTableCell>
                                 <StyledTableCell>{row.distrito}</StyledTableCell>
                                 <StyledTableCell>{row.direccion}</StyledTableCell>
                                 <StyledTableCell>{row.provincia}</StyledTableCell>
@@ -119,7 +110,7 @@ export default function ClientesTable({ rows, page, setPage, rowsPerPage, setRow
                                     </IconButton>
                                 </StyledTableCell>
                             </StyledTableRow>
-                        ))}
+                        )) : null }
                     </TableBody>
                 </Table>
                 <TablePagination

@@ -13,9 +13,7 @@ import { Select } from "@mui/material";
 import { MenuItem } from "@mui/material";
 import { Grid } from "@mui/material";
 import { useState } from "react";
-import AddTelephonNumberForm from "./AddTelephonNumberForm";
 
-import SimilarSearchModal from "./SimilarSearchModal";
 
 import clienteSchema from "../js/clienteSchema";
 
@@ -26,43 +24,8 @@ export default function FormCliente({
 	formValues,
 	handleChange,
 	handleSubmitForm,
-	telephons,
-	setTelephons,
-	openSubModal = false,
-	setSubModal = () => {},
-	encontrados = [],
-	handleCreateAnyway = () => {},
-	handleSelect = () => {},
 }) {
 	const [errors, setErrors] = useState({});
-	const [touched, setTouched] = useState({
-		documento_identidad: false,
-		nombres: false,
-		apellido_paterno: false,
-		apellido_materno: false,
-		provincia: false,
-		distrito: false,
-		direccion: false,
-		referencia: false,
-		comentario: false,
-		tipo_documento: false
-	});
-
-	useEffect(() => {
-		setErrors({});
-		setTouched({
-			documento_identidad: false,
-			nombres: false,
-			apellido_paterno: false,
-			apellido_materno: false,
-			provincia: false,
-			distrito: false,
-			direccion: false,
-			referencia: false,
-			comentario: false,
-			tipo_documento: false
-		});
-	}, [open]);
 
 	const validateForm = async () => {
 		try {
@@ -81,18 +44,6 @@ export default function FormCliente({
 		}
 	};
 
-	const handleBlur = async (event) => {
-		const { name, value } = event.target;
-		setTouched((prev) => ({ ...prev, [name]: true }));
-	  
-		try {
-		  await clienteSchema.validateAt(name, formValues);
-		  setErrors((prev) => ({ ...prev, [name]: undefined }));
-		} catch (err) {
-		  setErrors((prev) => ({ ...prev, [name]: err.message }));
-		}
-	};
-
 	const handleFormSubmit = (e) => {
 		e.preventDefault(); // Ensure this is called on a form submit event
 		validateForm();
@@ -105,45 +56,7 @@ export default function FormCliente({
 			<DialogContent>
 			<form onSubmit={handleFormSubmit}>
 				<Grid container spacing={2} mb={2}>
-					<Grid item xs={12} sm={6}>
-						<FormControl fullWidth margin="normal">
-							<InputLabel id="tipo_documento_label">
-								Tipo de Documento
-							</InputLabel>
-							<Select
-								labelId="tipo_documento_label"
-								name="tipo_documento"
-								id="tipo_documento"
-								value={formValues.tipo_documento}
-								label="Tipo de Documento"
-								onChange={handleChange}
-								error={!!errors.tipo_documento}
-							>
-								<MenuItem value={"0"}>
-								<em>None</em>
-								</MenuItem>
-								<MenuItem value={"1"}>DNI</MenuItem>
-								<MenuItem value={"2"}>Carnet de Extranjería</MenuItem>
-							</Select>
-							{errors.tipo_documento && <p>{errors.tipo_documento}</p>}
-						</FormControl>
-					</Grid>
 
-					<Grid item xs={12} sm={6} sx={{mt:1}}>
-					<TextField
-						autoFocus
-						margin="dense"
-						name="documento_identidad"
-						label="Documento de Identidad"
-						type="text"
-						fullWidth
-						variant="outlined"
-						value={formValues.documento_identidad}
-						onChange={handleChange}
-						error={!!errors.documento_identidad}
-						helperText={errors.documento_identidad}
-					/>
-					</Grid>
 
 					<Grid item xs={12} sm={6}>
 					<TextField
@@ -151,6 +64,7 @@ export default function FormCliente({
 						autoFocus
 						margin="dense"
 						name="nombres"
+						id="nombres"
 						label="Nombres"
 						type="text"
 						fullWidth
@@ -167,6 +81,7 @@ export default function FormCliente({
 						required
 						margin="dense"
 						name="apellido_paterno"
+						id="apellido_paterno"
 						label="Apellido Paterno"
 						type="text"
 						fullWidth
@@ -183,6 +98,7 @@ export default function FormCliente({
 						required
 						margin="dense"
 						name="apellido_materno"
+						id="apellido_materno"
 						label="Apellido Materno"
 						type="text"
 						fullWidth
@@ -270,16 +186,6 @@ export default function FormCliente({
 				</Grid>
 			</form>
 
-			<AddTelephonNumberForm
-				elementsArray={telephons}
-				setTF={setTelephons}
-			/>
-			{errors.num_telefono && (
-				<Typography variant="caption" color={"error"}>
-				{errors.num_telefono}
-				</Typography>
-			)}
-
 			</DialogContent>
 			<DialogActions>
 			<Button onClick={handleClose} color="primary">
@@ -294,15 +200,6 @@ export default function FormCliente({
 			</Button>
 			</DialogActions>
 		</Dialog>
-
-		<SimilarSearchModal
-			showSimilarModal={openSubModal}
-			title={"Clientes Similares"}
-			setSimilarModal={setSubModal}
-			encontrados={encontrados}
-			handleCreateAnyway={handleCreateAnyway}
-			handleSelect={handleSelect}
-		></SimilarSearchModal>
 		</Fragment>
 	);
 }

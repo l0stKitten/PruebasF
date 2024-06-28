@@ -1,4 +1,4 @@
-import { validateTipoDocumento, validateNames, validateNumTelefono, validateComentario } from "./personaFunctionsValidations.js";
+import { validateNames, validateComentario } from "./personaFunctionsValidations.js";
 // Function to validate distrito
 const validateDistrito = (distrito) => {
     const errors = [];
@@ -56,12 +56,9 @@ const validateDireccion = (direccion) => {
 // Main validation function
 const validationCliente = async (data) => {
     const {
-        documento_identidad,
-        tipo_documento,
         nombres,
         apellido_paterno,
         apellido_materno,
-        num_telefono,
         distrito,
         provincia,
         direccion,
@@ -70,9 +67,6 @@ const validationCliente = async (data) => {
   
     const errors = [];
 
-    // Validate tipo_documento
-    errors.push(...validateTipoDocumento(tipo_documento, documento_identidad));
-  
     // Validate nombres
     errors.push(...validateNames(nombres, 'Nombres'));
 
@@ -81,9 +75,6 @@ const validationCliente = async (data) => {
 
     // Validate apellido_materno
     errors.push(...validateNames(apellido_materno, 'Apellido materno'));
-
-    // Validate num_telefono
-    errors.push(...validateNumTelefono(num_telefono));
 
     errors.push(...validateDistrito(distrito));
 
