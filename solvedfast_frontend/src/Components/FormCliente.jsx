@@ -195,6 +195,7 @@ export default function FormCliente({
 				onClick={handleFormSubmit}
 				color="primary"
 				variant="contained"
+				id="submit-button"
 			>
 				Guardar
 			</Button>

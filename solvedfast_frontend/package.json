@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "mocha": "10.5.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@hookform/resolvers": "^3.4.2",
@@ -60,4 +61,5 @@
   "devDependencies": {
     "@cucumber/cucumber": "^10.8.0"
   }
+  
 }
